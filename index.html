@@ -51,8 +51,9 @@
   .view.active{display:flex}
   .scaler{transform-origin:center center}
   iframe{border:none; background:transparent; display:block}
-  /* device sizes (natural, scaled by JS) */
-  #frame-mobile{width:1120px; height:980px; border-radius:0}
+  /* mobile fills the stage (native, responsive render — no down-scaling) */
+  #view-mobile .scaler{width:100%; height:100%}
+  #frame-mobile{width:100%; height:100%; border-radius:0}
   #frame-desktop{width:1280px; height:800px; border-radius:14px;
     box-shadow:0 40px 90px rgba(15,40,30,.22)}
   .loader{position:absolute; font-size:13.5px; color:var(--muted); display:flex; gap:9px; align-items:center}
@@ -115,6 +116,7 @@
     }
 
     function fit(which){
+      if(which==="mobile") return; // mobile fills its container, no scaling
       var stage = document.querySelector(".stage");
       var availW = stage.clientWidth  - 36;
       var availH = stage.clientHeight - 36;

@@ -1,0 +1,9 @@
+*.bak
+.claude/
+*_dom.html
+shot_*.png
+m_*.png
+mtall*.png
+combo_*.png
+verify*.png
+sample_*.png

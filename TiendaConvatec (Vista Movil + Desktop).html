@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TiendaConvatec — Vista Móvil / Escritorio</title>
+<style>
+  :root{
+    --bg:#EAE5F1; --bg2:#E0D8EC; --surface:#fff; --ink:#251A30; --muted:#6E6479;
+    --line:#E5DCEE; --plum:#C2168C; --teal:#6E2C91; --teal-deep:#4B1D6E; --mint:#F2E9F8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    background:radial-gradient(120% 90% at 80% 0%, #EEF2EF 0%, var(--bg) 45%, var(--bg2) 100%);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  /* top bar */
+  header{
+    flex:0 0 auto; display:flex; align-items:center; gap:18px;
+    padding:14px 22px; background:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+    border-bottom:1px solid var(--line); z-index:5;
+  }
+  .brand{display:flex; align-items:center; gap:10px; flex-shrink:0}
+  .dot{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--plum),var(--teal));box-shadow:0 4px 12px rgba(110,44,145,.3)}
+  .dot svg{display:block}
+  .brand b{font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--teal-deep)}
+  .brand span{font-size:12.5px;color:var(--muted);font-weight:500}
+  /* segmented toggle */
+  .seg{margin-left:auto; display:inline-flex; background:var(--mint); border:1px solid var(--line);
+    border-radius:13px; padding:4px; gap:4px}
+  .seg button{
+    display:inline-flex; align-items:center; gap:8px;
+    height:38px; padding:0 18px; border:none; cursor:pointer;
+    border-radius:10px; font:inherit; font-size:14.5px; font-weight:700;
+    color:var(--teal-deep); background:transparent; transition:all .18s ease;
+  }
+  .seg button svg{display:block}
+  .seg button.active{background:var(--surface); color:var(--plum);
+    box-shadow:0 2px 8px rgba(75,29,110,.14)}
+  .hint{font-size:12.5px;color:var(--muted);margin-left:14px;white-space:nowrap}
+  @media (max-width:720px){ .hint{display:none} .brand span{display:none} }
+  /* stage */
+  .stage{flex:1 1 auto; position:relative; display:flex; align-items:center; justify-content:center;
+    overflow:hidden; padding:18px}
+  .view{position:absolute; inset:0; display:none; align-items:center; justify-content:center}
+  .view.active{display:flex}
+  .scaler{transform-origin:center center}
+  iframe{border:none; background:transparent; display:block}
+  /* device sizes (natural, scaled by JS) */
+  #frame-mobile{width:1120px; height:980px; border-radius:0}
+  #frame-desktop{width:1280px; height:800px; border-radius:14px;
+    box-shadow:0 40px 90px rgba(15,40,30,.22)}
+  .loader{position:absolute; font-size:13.5px; color:var(--muted); display:flex; gap:9px; align-items:center}
+  .spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--plum);
+    border-radius:50%;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="dot">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-7-10A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7-.1c0 5.6-7 14.1-7 14.1Z" fill="#fff"/></svg>
+      </span>
+      <div>
+        <b>TiendaConvatec</b><br><span>Mockup · Ostomía</span>
+      </div>
+    </div>
+    <div class="seg" role="tablist">
+      <button id="tab-mobile" class="active" onclick="show('mobile')" aria-label="Vista móvil">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2.5"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Móvil
+      </button>
+      <button id="tab-desktop" onclick="show('desktop')" aria-label="Vista escritorio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Escritorio
+      </button>
+    </div>
+    <div class="hint">Selecciona la vista para presentar el prototipo</div>
+  </header>
+
+  <div class="stage">
+    <div id="view-mobile" class="view active">
+      <div class="loader" id="ld-mobile"><span class="spin"></span> Cargando vista móvil…</div>
+      <div class="scaler" id="sc-mobile"><iframe id="frame-mobile" scrolling="no" title="TiendaConvatec Móvil"></iframe></div>
+    </div>
+    <div id="view-desktop" class="view">
+      <div class="loader" id="ld-desktop"><span class="spin"></span> Cargando vista escritorio…</div>
+      <div class="scaler" id="sc-desktop"><iframe id="frame-desktop" scrolling="no" title="TiendaConvatec Escritorio"></iframe></div>
+    </div>
+  </div>
+
+  <script>
+    var SRC = {
+      mobile: encodeURI("TiendaConvatec Mobile (standalone).html"),
+      desktop: encodeURI("TiendaConvatec Desktop (standalone).html")
+    };
+    var NAT = { mobile:[1120,980], desktop:[1280,800] };
+    var loaded = {};
+
+    function ensureLoaded(which){
+      if(loaded[which]) return;
+      loaded[which] = true;
+      var f = document.getElementById("frame-"+which);
+      f.addEventListener("load", function(){
+        var ld = document.getElementById("ld-"+which);
+        if(ld) ld.style.display = "none";
+      });
+      f.src = SRC[which];
+    }
+
+    function fit(which){
+      var stage = document.querySelector(".stage");
+      var availW = stage.clientWidth  - 36;
+      var availH = stage.clientHeight - 36;
+      var n = NAT[which];
+      var s = Math.min(1, availW/n[0], availH/n[1]);
+      document.getElementById("sc-"+which).style.transform = "scale("+s+")";
+    }
+
+    function show(which){
+      ["mobile","desktop"].forEach(function(w){
+        document.getElementById("view-"+w).classList.toggle("active", w===which);
+        document.getElementById("tab-"+w).classList.toggle("active", w===which);
+      });
+      ensureLoaded(which);
+      fit(which);
+    }
+
+    window.addEventListener("resize", function(){
+      ["mobile","desktop"].forEach(function(w){ if(loaded[w]) fit(w); });
+    });
+
+    // default: mobile first
+    ensureLoaded("mobile");
+    fit("mobile");
+  </script>
+</body>
+</html>

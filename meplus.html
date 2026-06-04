@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TiendaConvatec · me+ Programa de acompañamiento</title>
+<style>
+  :root{
+    --bg:#F3F0FA; --surface:#fff; --ink:#241830; --muted:#7A7186; --soft:#9A92A6;
+    --line:#ECE5F4; --plum:#C2168C; --teal:#6E2C91; --teal-deep:#4B1D6E; --mint:#F4ECFA;
+    --ok:#1E9E6A; --okbg:#E4F6EE; --warn:#C97A12; --warnbg:#FBF0DD; --bad:#C0392B; --badbg:#FBE7E4;
+    --info:#2563C9; --infobg:#E6EEFB;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 80% at 90% 0%, #FBEFF7 0%, var(--bg) 55%); height:100vh; overflow:hidden; display:flex; flex-direction:column}
+
+  header{flex:0 0 auto; display:flex; align-items:center; gap:14px; padding:14px 26px;
+    background:rgba(255,255,255,.8); backdrop-filter:blur(12px); border-bottom:1px solid var(--line)}
+  .brand{display:flex; align-items:center; gap:11px}
+  .brand .mk{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--plum),var(--teal))}
+  .brand b{font-size:17px;font-weight:800;color:var(--teal-deep);display:block;line-height:1.1}
+  .brand .me{font-size:11.5px;color:var(--plum);font-weight:700}
+  header .tag{margin-left:6px; font-size:12px; color:var(--muted); border-left:1px solid var(--line); padding-left:14px}
+  .liveDot{margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:600;
+    color:var(--ok); background:var(--okbg); padding:7px 12px; border-radius:20px}
+  .liveDot i{width:8px;height:8px;border-radius:50%;background:var(--ok); animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,158,106,.5)}70%{box-shadow:0 0 0 8px rgba(30,158,106,0)}100%{box-shadow:0 0 0 0 rgba(30,158,106,0)}}
+
+  .wrap{flex:1 1 auto; overflow:hidden; display:flex}
+  /* lista pacientes */
+  .plist{flex:0 0 318px; background:var(--surface); border-right:1px solid var(--line); overflow:auto; padding:14px}
+  .plist h2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);font-weight:700;padding:6px 8px 10px}
+  .pitem{display:flex; align-items:center; gap:12px; padding:12px; border-radius:13px; cursor:pointer; transition:.15s; margin-bottom:4px}
+  .pitem:hover{background:var(--mint)} .pitem.active{background:var(--mint); box-shadow:inset 3px 0 0 var(--plum)}
+  .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;flex:0 0 40px}
+  .pitem .nm{font-weight:700;font-size:13.5px;line-height:1.2} .pitem .mt{font-size:11.5px;color:var(--soft);margin-top:2px}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+  .b-ok{background:var(--okbg);color:var(--ok)} .b-warn{background:var(--warnbg);color:var(--warn)}
+  .b-bad{background:var(--badbg);color:var(--bad)} .b-info{background:var(--infobg);color:var(--info)}
+  .b-mut{background:#F0ECF6;color:var(--muted)} .b-plum{background:var(--mint);color:var(--plum)}
+
+  /* detalle */
+  .detail{flex:1 1 auto; overflow:auto; padding:24px 28px}
+  .phead{display:flex; align-items:flex-start; gap:18px; margin-bottom:22px}
+  .phead .big{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:26px;flex:0 0 72px}
+  .phead h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .phead .row{font-size:13px;color:var(--muted);margin-top:4px}
+  .phead .chips{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:17px}
+  .card.full{grid-column:1/-1}
+  .card.two{grid-column:span 2}
+  .card h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--plum);font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .dl{display:grid;grid-template-columns:1fr 1fr;gap:13px 16px}
+  .dl .k{font-size:10.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.03em}
+  .dl .v{font-size:13.5px;font-weight:600;margin-top:2px}
+
+  .ring{display:flex;align-items:center;gap:16px}
+  .ring svg{flex:0 0 auto}
+  .ring .big{font-size:30px;font-weight:800;color:var(--teal-deep)}
+  .ring .lbl{font-size:12px;color:var(--muted)}
+
+  .tl{position:relative;padding-left:22px;margin-top:4px}
+  .tl:before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line)}
+  .tl .ev{position:relative;padding:0 0 15px 6px}
+  .tl .ev:last-child{padding-bottom:0}
+  .tl .ev:before{content:"";position:absolute;left:-19px;top:3px;width:11px;height:11px;border-radius:50%;background:var(--plum);box-shadow:0 0 0 3px var(--mint)}
+  .tl .ev.next:before{background:#fff;border:2px solid var(--plum)}
+  .tl .ev .t{font-size:13px;font-weight:700} .tl .ev .d{font-size:11.5px;color:var(--soft);margin-top:1px}
+
+  .edu{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #F4EFF9}
+  .edu:last-child{border-bottom:none}
+  .edu .ic{width:38px;height:38px;border-radius:11px;background:var(--mint);display:grid;place-items:center;font-size:18px;flex:0 0 38px}
+  .edu .t{font-weight:700;font-size:13px} .edu .d{font-size:11.5px;color:var(--soft)}
+
+  .bar{height:9px;border-radius:6px;background:#EFE9F6;overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--plum),var(--teal))}
+  .stat{display:flex;justify-content:space-between;align-items:baseline}
+  .stat .n{font-size:24px;font-weight:800;color:var(--teal-deep)} .stat .u{font-size:12px;color:var(--muted)}
+
+  .order{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F4EFF9}
+  .order:last-child{border-bottom:none}
+  .order .id{font-weight:700;font-size:12.5px;font-variant-numeric:tabular-nums}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal-deep);color:#fff;padding:13px 20px;border-radius:13px;font-size:13.5px;font-weight:600;box-shadow:0 14px 40px rgba(40,20,55,.35);opacity:0;pointer-events:none;transition:.3s;z-index:60;display:flex;align-items:center;gap:11px}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .flash{animation:flash 2.2s ease}
+  @keyframes flash{0%,30%{background:#FFF6DD}100%{background:transparent}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="mk"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-7-10A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7-.1c0 5.6-7 14.1-7 14.1Z" fill="#fff"/></svg></span>
+      <div><b>me<span style="color:#fff">+</span></b></div>
+      <div><b style="font-size:15px">Programa de acompañamiento</b><span class="me">Convatec · Ostomía</span></div>
+    </div>
+    <span class="tag">Acompañamiento clínico y educativo del paciente ostomizado</span>
+    <div class="liveDot"><i></i> Sincronizado con CRM</div>
+  </header>
+
+  <div class="wrap">
+    <aside class="plist" id="plist"></aside>
+    <main class="detail" id="detail"></main>
+  </div>
+
+  <div class="toast" id="toast"><span>🛒</span><span id="toastMsg"></span></div>
+
+<script src="store.js"></script>
+<script>
+  var S = window.ConvatecStore;
+  var fmt=S.fmt, fdate=S.fecha;
+  var COLORS=["#C2168C","#6E2C91","#2563C9","#1E9E6A","#C97A12","#8A2C8E"];
+  function avc(id){var n=0;for(var i=0;i<id.length;i++)n+=id.charCodeAt(i);return COLORS[n%COLORS.length];}
+  function ini(nm){var p=nm.split(" ");return (p[0][0]+(p[1]?p[1][0]:"")).toUpperCase();}
+  function esc(s){return (s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  var sel=null;
+
+  function renderList(){
+    var s=S.get();
+    var html='<h2>Pacientes en programa</h2>'+ s.clientes.map(function(c){
+      var b=c.meplus.estado==="Activo"?"b-ok":(c.meplus.estado==="Onboarding"?"b-info":(c.meplus.estado==="Inactivo"?"b-bad":"b-mut"));
+      return '<div class="pitem '+(c.id===sel?"active":"")+'" onclick="select(\''+c.id+'\')">'+
+        '<span class="av" style="background:'+avc(c.id)+'">'+ini(c.nombre)+'</span>'+
+        '<div style="flex:1;min-width:0"><div class="nm">'+esc(c.nombre)+'</div><div class="mt">'+esc(c.estoma.tipo)+' · '+c.ciudad+'</div></div>'+
+        '<span class="badge '+b+'">'+c.meplus.estado+'</span></div>';
+    }).join("");
+    document.getElementById("plist").innerHTML=html;
+  }
+
+  function select(id){ sel=id; renderList(); renderDetail(); }
+
+  function ringSvg(pct){
+    var r=30, c=2*Math.PI*r, off=c*(1-pct/100);
+    return '<svg width="78" height="78" viewBox="0 0 78 78"><circle cx="39" cy="39" r="30" fill="none" stroke="#EFE9F6" stroke-width="9"/>'+
+      '<circle cx="39" cy="39" r="30" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 39 39)"/>'+
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C2168C"/><stop offset="1" stop-color="#6E2C91"/></linearGradient></defs>'+
+      '<text x="39" y="44" text-anchor="middle" font-size="19" font-weight="800" fill="#4B1D6E">'+pct+'%</text></svg>';
+  }
+
+  function renderDetail(){
+    var s=S.get(); var c=null;
+    for(var i=0;i<s.clientes.length;i++) if(s.clientes[i].id===sel) c=s.clientes[i];
+    if(!c){ document.getElementById("detail").innerHTML=""; return; }
+    var pedidos=s.ordenes.filter(function(o){return o.clienteId===c.id;});
+    var rec=S.recompra().filter(function(r){return r.cliente.id===c.id;})[0];
+    var b=c.meplus.estado==="Activo"?"b-ok":(c.meplus.estado==="Onboarding"?"b-info":"b-mut");
+
+    // agenda de seguimiento (ficticia, derivada del programa)
+    var agenda=[
+      {t:"Valoración inicial de estoma", d:fdate(c.estoma.cirugia)+" · presencial", done:true},
+      {t:"Educación: cambio de dispositivo", d:"Sesión virtual · completada", done:true},
+      {t:"Control de adherencia y piel periestomal", d:fdate(c.meplus.ultimaVisita)+" · "+esc(c.meplus.enfermera), done:true},
+      {t:"Seguimiento telefónico me+", d:(rec? "Programado para "+fdate(rec.proxima):"Por programar")+" · próximo", done:false}
+    ];
+
+    document.getElementById("detail").innerHTML=
+    '<div class="phead">'+
+      '<span class="big" style="background:'+avc(c.id)+'">'+ini(c.nombre)+'</span>'+
+      '<div style="flex:1"><h1>'+esc(c.nombre)+'</h1>'+
+        '<div class="row">'+c.id+' · '+c.doc+' · '+c.edad+' años · '+c.ciudad+'</div>'+
+        '<div class="chips"><span class="badge '+b+'">me+ '+esc(c.meplus.nivel)+' · '+c.meplus.estado+'</span>'+
+          '<span class="badge b-plum">'+esc(c.estoma.tipo)+'</span>'+
+          '<span class="badge b-mut">'+esc(c.meplus.enfermera)+'</span>'+
+          '<span class="badge b-mut">'+esc(c.eps)+'</span></div></div>'+
+    '</div>'+
+
+    '<div class="grid">'+
+      '<div class="card"><h3>💜 Adherencia al tratamiento</h3><div class="ring">'+ringSvg(c.meplus.adherencia)+
+        '<div><div class="lbl">Uso correcto del dispositivo</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Meta del programa: 85%</div>'+
+        '<div style="margin-top:6px">'+(c.meplus.adherencia>=85?'<span class="badge b-ok">En meta</span>':'<span class="badge b-warn">Requiere refuerzo</span>')+'</div></div></div></div>'+
+
+      '<div class="card"><h3>🩺 Perfil del estoma</h3><div class="dl">'+
+        dd("Tipo",c.estoma.tipo)+dd("Motivo",c.estoma.motivo)+
+        dd("Cirugía",fdate(c.estoma.cirugia))+dd("Diámetro",c.estoma.diametro)+
+        dd("Piel periestomal",c.estoma.piel)+dd("Régimen",c.regimen)+
+      '</div></div>'+
+
+      '<div class="card"><h3>📞 Contacto & enfermería</h3><div class="dl">'+
+        dd("Enfermera",c.meplus.enfermera)+dd("Última visita",fdate(c.meplus.ultimaVisita))+
+        dd("Teléfono",c.tel)+dd("Email",c.email)+
+      '</div></div>'+
+
+      '<div class="card two"><h3>📅 Plan de acompañamiento me+</h3><div class="tl">'+
+        agenda.map(function(a){return '<div class="ev '+(a.done?"":"next")+'"><div class="t">'+a.t+'</div><div class="d">'+a.d+'</div></div>';}).join("")+
+      '</div></div>'+
+
+      '<div class="card"><h3>📚 Contenido educativo asignado</h3>'+
+        edu("🎥","Cómo vaciar y cambiar la bolsa","Video · 6 min")+
+        edu("🧼","Cuidado de la piel periestomal","Guía PDF")+
+        edu("🥗","Alimentación con "+c.estoma.tipo.toLowerCase(),"Artículo")+
+        edu("💬","Comunidad de pacientes me+","Grupo de apoyo")+
+      '</div>'+
+
+      '<div class="card two"><h3>🔁 Recompra & suministro</h3>'+
+        (rec? '<div class="dl"><div><div class="k">PRODUCTO BASE</div><div class="v">'+esc(rec.producto)+'</div></div>'+
+          '<div><div class="k">FRECUENCIA</div><div class="v">cada '+rec.frecuencia+' días</div></div>'+
+          '<div><div class="k">ÚLTIMA COMPRA</div><div class="v">'+fdate(rec.ultima)+'</div></div>'+
+          '<div><div class="k">PRÓXIMA ESTIMADA</div><div class="v">'+fdate(rec.proxima)+' '+
+            (rec.estado==="Vencida"?'<span class="badge b-bad">vencida</span>':(rec.estado==="Próxima"?'<span class="badge b-warn">próxima</span>':'<span class="badge b-info">programada</span>'))+'</div></div></div>'
+          : '<div style="color:var(--soft);font-size:13px">Sin historial de consumo todavía.</div>')+
+      '</div>'+
+
+      '<div class="card"><h3>📦 Estado de suministro</h3><div class="stat"><div class="n">'+pedidos.length+'</div><div class="u">pedidos totales</div></div>'+
+        '<div class="bar"><i style="width:'+Math.min(100,pedidos.length*14)+'%"></i></div>'+
+        '<div style="margin-top:14px;font-size:12px;color:var(--muted)">Valor acumulado</div>'+
+        '<div style="font-size:18px;font-weight:800;color:var(--teal-deep)">'+fmt(pedidos.reduce(function(a,o){return a+o.total;},0))+'</div></div>'+
+
+      '<div class="card full"><h3>🧾 Historial de suministro (sincronizado con la tienda)</h3>'+
+        (pedidos.length? pedidos.map(function(o){
+          return '<div class="order" data-ord="'+o.id+'"><span class="av" style="width:30px;height:30px;flex:0 0 30px;font-size:12px;background:var(--mint);color:var(--plum)">📦</span>'+
+            '<div style="flex:1"><div class="id">'+o.id+' · '+fmt(o.total)+'</div><div style="font-size:11.5px;color:var(--soft)">'+fdate(o.fecha)+' · canal '+esc(o.canal)+' · '+o.items.map(function(it){return it.qty+"× "+it.nombre.split(" ").slice(0,2).join(" ");}).join(", ")+'</div></div>'+
+            '<span class="badge '+(o.estado==="Entregado"?"b-ok":(o.estado==="En tránsito"?"b-info":"b-warn"))+'">'+o.estado+'</span></div>';
+        }).join("") : '<div style="color:var(--soft);font-size:13px;padding:14px 0">Aún no hay compras. Realiza una compra desde el mockup móvil/web para verla aparecer aquí.</div>')+
+      '</div>'+
+    '</div>';
+  }
+  function dd(k,v){return '<div><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';}
+  function edu(ic,t,d){return '<div class="edu"><span class="ic">'+ic+'</span><div><div class="t">'+t+'</div><div class="d">'+d+'</div></div></div>';}
+
+  var toastT;
+  function toast(m){document.getElementById("toastMsg").textContent=m;var t=document.getElementById("toast");t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},3200);}
+
+  S.subscribe(function(s, orden){
+    renderList(); renderDetail();
+    if(orden){
+      var c=null; for(var i=0;i<s.clientes.length;i++) if(s.clientes[i].id===orden.clienteId) c=s.clientes[i];
+      toast("Compra "+orden.id+" sincronizada · "+(c?c.nombre:"")+" · "+orden.canal);
+      if(orden.clienteId===sel){ setTimeout(function(){var r=document.querySelector('[data-ord="'+orden.id+'"]'); if(r) r.classList.add("flash");},60); }
+    }
+  });
+
+  // selección inicial
+  var s0=S.get(); sel=s0.clientes[0].id;
+  renderList(); renderDetail();
+</script>
+</body>
+</html>

@@ -9,8 +9,9 @@
 (function (global) {
   "use strict";
 
-  var KEY = "convatec_crm_v2";
+  var KEY = "convatec_crm_v3";
   var CH = "convatec:change";
+  var APP_USER = "C-1042"; // usuaria conectada en el mockup móvil/web ("Laura")
 
   /* ---------- Catálogo de productos ---------- */
   var CATALOG = [
@@ -29,8 +30,8 @@
   function seed() {
     var clientes = [
       {
-        id: "C-1042", nombre: "María Fernanda Rojas", doc: "CC 39.482.115", edad: 58, sexo: "F",
-        ciudad: "Bogotá D.C.", barrio: "Cedritos", tel: "+57 311 482 1190", email: "mfrojas@gmail.com",
+        id: "C-1042", nombre: "Laura Gómez Restrepo", doc: "CC 39.482.115", edad: 58, sexo: "F",
+        ciudad: "Bogotá D.C.", barrio: "Cedritos", tel: "+57 311 482 1190", email: "laura.gomez@gmail.com",
         eps: "Sura EPS", regimen: "Contributivo",
         estoma: { tipo: "Colostomía", motivo: "Cáncer colorrectal", cirugia: "2023-08-14", diametro: "45 mm", piel: "Estable" },
         meplus: { estado: "Activo", nivel: "Plus Cuidado", enfermera: "Enf. Diana Castaño", ultimaVisita: "2026-05-12", adherencia: 92 },
@@ -84,7 +85,7 @@
     });
 
     var s = {
-      v: 2,
+      v: 3,
       clientes: clientes,
       ordenes: [],
       inventario: inventario,
@@ -150,7 +151,7 @@
     if (!raw) { var s = seed(); persist(s); return s; }
     try {
       var data = JSON.parse(raw);
-      if (!data || data.v !== 2) { var s2 = seed(); persist(s2); return s2; }
+      if (!data || data.v !== 3) { var s2 = seed(); persist(s2); return s2; }
       return data;
     } catch (e) { var s3 = seed(); persist(s3); return s3; }
   }
@@ -161,6 +162,7 @@
   /* ---------- API pública ---------- */
   var Store = {
     KEY: KEY,
+    APP_USER: APP_USER,
     CATALOG: CATALOG,
 
     get: function () { return load(); },
@@ -194,19 +196,32 @@
 
       var total = items.reduce(function (a, it) { return a + it.qty * it.precio; }, 0);
       s.counter += 1;
+      var canal = opts.canal || "Móvil";
+      var subs = !!opts.subscripcion;
       var orden = {
         id: "OC-" + (s.counter + 7),
         clienteId: cli.id,
-        canal: opts.canal || "Móvil",
+        canal: canal,
         fecha: new Date().toISOString(),
         items: items,
         total: total,
         estado: "Recibido",
         despacho: { transportadora: "Por asignar", guia: "—", eta: daysFromNowISO(3), bodega: "CD Funza (Bogotá)" },
-        nota: "Compra ingresada automáticamente desde canal " + (opts.canal || "Móvil"),
+        nota: opts.real
+          ? "Compra REAL detectada en el mockup " + canal + (subs ? " · recompra me+" : "")
+          : "Compra ingresada desde canal " + canal,
+        real: !!opts.real,
+        subscripcion: subs,
         nuevo: true
       };
       s.ordenes.unshift(orden);
+
+      // Movimiento de suscripción me+ (mueve la próxima entrega del cliente)
+      if (subs && cli.meplus) {
+        var freq = findCat(items[0].sku).freq || 30;
+        cli.meplus.proximaEntrega = daysFromNowISO(freq);
+        cli.meplus.ultimaCompra = orden.fecha;
+      }
 
       // Descontar inventario
       items.forEach(function (it) {

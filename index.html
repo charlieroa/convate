@@ -180,8 +180,97 @@
       f.addEventListener("load", function(){
         var ld = document.getElementById("ld-"+which);
         if(ld) ld.style.display = "none";
+        if(which==="mobile" || which==="desktop") hookShop(which, f);
       });
       f.src = SRC[which];
+    }
+
+    /* ============================================================
+       DETECCIÓN DE COMPRA REAL dentro del mockup (móvil/escritorio)
+       El bundle es una app React (mismo origen) → leemos el DOM ya
+       renderizado y escuchamos los clics de checkout / recompra.
+       ============================================================ */
+    var lastBuyTs = 0;
+    // Frases de intención de compra/checkout/recompra (texto visible del botón)
+    var BUY_RE = /\b(pagar|finalizar (compra|pedido|y pagar)|confirmar (compra|pedido|orden|y pagar)|realizar (pedido|compra|el pago|el pedido)|completar (compra|pedido|pago)|proceder (al|con el) pago|hacer pedido|pagar ahora|comprar ahora|comprar de nuevo|volver a comprar|repetir (pedido|compra)|suscribir|activar suscripci)\b/i;
+    // Frases de confirmación (pantalla de "gracias / pedido confirmado")
+    var DONE_RE = /(pedido confirmado|compra (exitosa|confirmada|realizada)|gracias por tu compra|tu pedido (está|esta|fue|ha sido)|pedido #|n\.? ?de pedido|orden confirmada|¡listo!|pago aprobado|recibimos tu pedido)/i;
+
+    function hookShop(which, frame){
+      var doc;
+      try { doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document); }
+      catch(e){ doc = null; } // cross-origin (no debería pasar: mismo origen)
+      if(!doc){ console.warn("No se pudo acceder al iframe "+which+" (cross-origin)"); return; }
+
+      // 1) Clic en un botón de checkout/recompra
+      doc.addEventListener("click", function(ev){
+        var node = ev.target, txt = "";
+        for(var i=0; i<6 && node; i++){
+          var t = (node.innerText || node.textContent || "").replace(/\s+/g," ").trim();
+          if(t && t.length <= 48){ txt = t; break; }
+          node = node.parentElement;
+        }
+        if(!txt) return;
+        if(BUY_RE.test(txt)) registerRealBuy(which, txt, false);
+      }, true);
+
+      // 2) Aparición de una pantalla de confirmación de pedido
+      try{
+        var obs = new MutationObserver(function(muts){
+          for(var m=0;m<muts.length;m++){
+            var added = muts[m].addedNodes;
+            for(var a=0;a<added.length;a++){
+              var el = added[a];
+              if(el.nodeType!==1) continue;
+              var t = (el.innerText || el.textContent || "");
+              if(t && DONE_RE.test(t)){ registerRealBuy(which, "pedido confirmado", true); return; }
+            }
+          }
+        });
+        obs.observe(doc.body || doc.documentElement, {childList:true, subtree:true});
+      }catch(e){}
+    }
+
+    function registerRealBuy(which, label, fromConfirm){
+      var now = Date.now();
+      if(now - lastBuyTs < 2500) return; // anti-doble-disparo
+      lastBuyTs = now;
+
+      var canal = which==="desktop" ? "Web" : "Móvil";
+      var l = (label||"").toLowerCase();
+      var esRecompra = /volver a comprar|comprar de nuevo|repetir|suscrib|suscripci/.test(l);
+
+      // Producto: intenta leer un producto/precio visible en el iframe; si no, usa el de recompra de la usuaria
+      var item = sniffProduct(which) || defaultItemForUser();
+
+      var orden = S.addOrder({
+        clienteId: S.APP_USER,        // la usuaria conectada en el mockup ("Laura")
+        canal: canal,
+        items: [item],
+        real: true,
+        subscripcion: esRecompra
+      });
+      var c = S.cliente(orden.clienteId);
+      posToast("✓ Compra REAL detectada ("+canal+") · "+(c?c.nombre:"")+" → "+orden.id+" cargada al CRM"+(esRecompra?" · suscripción me+ movida":""));
+    }
+
+    // Intenta leer un nombre de producto y precio visibles dentro del iframe
+    function sniffProduct(which){
+      try{
+        var doc = document.getElementById("frame-"+which).contentDocument;
+        var txt = (doc.body.innerText||"");
+        // ¿algún producto del catálogo aparece nombrado en pantalla?
+        for(var i=0;i<S.CATALOG.length;i++){
+          var key = S.CATALOG[i].nombre.split(" ").slice(0,2).join(" ");
+          if(txt.indexOf(key)>=0) return { sku:S.CATALOG[i].sku, qty:1 };
+        }
+      }catch(e){}
+      return null;
+    }
+    function defaultItemForUser(){
+      // producto base de recompra de la usuaria conectada
+      var r = S.recompra().filter(function(x){return x.cliente.id===S.APP_USER;})[0];
+      return r ? { sku:r.sku, qty:1 } : { sku:S.CATALOG[0].sku, qty:1 };
     }
 
     function fit(which){

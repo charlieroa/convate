@@ -159,6 +159,20 @@
   .empty{padding:40px; text-align:center; color:var(--soft); font-size:13.5px}
   .flash{animation:flash 2s ease}
   @keyframes flash{0%{background:#FFF6DD}30%{background:#FFF6DD}100%{background:transparent}}
+  /* alerta de compra real */
+  .alertbar{position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-130%);
+    display:flex; align-items:center; gap:13px; min-width:430px; max-width:92vw;
+    background:linear-gradient(135deg,var(--plum),var(--teal)); color:#fff; padding:13px 14px 13px 18px;
+    border-radius:15px; box-shadow:0 18px 50px rgba(75,29,110,.4); z-index:70; transition:transform .4s cubic-bezier(.2,1.3,.4,1)}
+  .alertbar.show{transform:translateX(-50%) translateY(0)}
+  .alertbar .ab-ic{font-size:22px; animation:ring .9s ease 2}
+  @keyframes ring{0%,100%{transform:rotate(0)}25%{transform:rotate(16deg)}75%{transform:rotate(-16deg)}}
+  .alertbar .ab-tx{display:flex; flex-direction:column; line-height:1.3; flex:1}
+  .alertbar .ab-tx b{font-size:14px} .alertbar .ab-tx span{font-size:12.5px; opacity:.92}
+  .alertbar .ab-go{background:#fff; color:var(--plum); border:none; font:inherit; font-weight:800;
+    font-size:12.5px; padding:8px 13px; border-radius:10px; cursor:pointer; white-space:nowrap}
+  .alertbar .ab-x{background:rgba(255,255,255,.18); border:none; color:#fff; width:30px; height:30px;
+    border-radius:9px; cursor:pointer; font-size:15px}
   .secTitle{font-size:13px; font-weight:800; color:var(--teal-deep); margin:22px 0 12px; display:flex; align-items:center; gap:8px}
 </style>
 </head>
@@ -218,6 +232,14 @@
   <!-- Drawer hoja de vida -->
   <div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
   <aside class="drawer" id="drawer"></aside>
+
+  <!-- ALERTA de compra real (banner superior) -->
+  <div class="alertbar" id="alertbar">
+    <span class="ab-ic">🔔</span>
+    <div class="ab-tx"><b id="abTitle">Nueva compra recibida</b><span id="abMsg"></span></div>
+    <button class="ab-go" id="abGo">Ver orden →</button>
+    <button class="ab-x" onclick="hideAlert()">✕</button>
+  </div>
 
   <div class="toast" id="toast"><span class="tk">🛒</span><span id="toastMsg"></span></div>
 
@@ -550,10 +572,22 @@
     var t=document.getElementById("toast"); t.classList.add("show");
     clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove("show");}, 3200);
   }
+  var alertT;
+  function showAlert(orden, c){
+    var sub = orden.subscripcion ? " · suscripción me+ reprogramada" : "";
+    document.getElementById("abTitle").textContent = (orden.real?"🛒 Compra recibida desde "+orden.canal:"Nueva compra registrada");
+    document.getElementById("abMsg").textContent = orden.id+" · "+(c?c.nombre:"")+" · "+fmt(orden.total)+sub;
+    document.getElementById("abGo").onclick = function(){ go("ordenes"); openOrder(orden.id); hideAlert(); };
+    var b = document.getElementById("alertbar"); b.classList.add("show");
+    clearTimeout(alertT); alertT = setTimeout(hideAlert, 7000);
+  }
+  function hideAlert(){ document.getElementById("alertbar").classList.remove("show"); }
+
   S.subscribe(function(s, orden){
     render();
     if(orden){
       var c = clienteOf(s, orden.clienteId);
+      showAlert(orden, c);
       toast("Nueva compra "+orden.id+" · "+(c?c.nombre:"")+" · "+orden.canal);
       // resalta la primera fila
       setTimeout(function(){

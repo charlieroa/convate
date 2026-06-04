@@ -228,7 +228,7 @@
     renderList(); renderDetail();
     if(orden){
       var c=null; for(var i=0;i<s.clientes.length;i++) if(s.clientes[i].id===orden.clienteId) c=s.clientes[i];
-      toast("Compra "+orden.id+" sincronizada · "+(c?c.nombre:"")+" · "+orden.canal);
+      toast((orden.subscripcion?"🔁 Suscripción me+ movida · ":"Compra "+orden.id+" sincronizada · ")+(c?c.nombre:"")+" · "+orden.canal);
       if(orden.clienteId===sel){ setTimeout(function(){var r=document.querySelector('[data-ord="'+orden.id+'"]'); if(r) r.classList.add("flash");},60); }
     }
   });

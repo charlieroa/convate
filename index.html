@@ -64,30 +64,10 @@
   #frame-mobile{width:100%; height:100%; border-radius:0}
   #frame-desktop{width:1280px; height:800px; border-radius:14px;
     box-shadow:0 40px 90px rgba(15,40,30,.22)}
-  /* crm + me+ fill the stage natively */
-  #view-crm .scaler, #view-meplus .scaler{width:100%; height:100%}
-  #frame-crm, #frame-meplus{width:100%; height:100%; border-radius:0}
+  /* me+ fills the stage natively */
+  #view-meplus .scaler{width:100%; height:100%}
+  #frame-meplus{width:100%; height:100%; border-radius:0}
 
-  /* ---- Punto de venta demo (sólo en Móvil/Escritorio) ---- */
-  .pos{position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
-    display:none; align-items:center; gap:12px; background:rgba(255,255,255,.92);
-    backdrop-filter:blur(14px) saturate(160%); border:1px solid var(--line);
-    box-shadow:0 14px 44px rgba(75,29,110,.22); border-radius:16px; padding:10px 12px 10px 16px; z-index:8}
-  .pos.show{display:flex}
-  .pos .pl{font-size:12.5px; line-height:1.25}
-  .pos .pl b{color:var(--teal-deep)} .pos .pl span{color:var(--muted)}
-  .pos select{font:inherit; font-size:12.5px; font-weight:600; color:var(--teal-deep);
-    border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; max-width:190px}
-  .pos .buy{display:inline-flex; align-items:center; gap:7px; border:none; cursor:pointer;
-    background:linear-gradient(135deg,var(--plum),var(--teal)); color:#fff; font:inherit; font-size:13px;
-    font-weight:800; padding:10px 16px; border-radius:11px; transition:.15s}
-  .pos .buy:hover{filter:brightness(1.07)}
-  .pos .pulse{width:9px;height:9px;border-radius:50%;background:var(--plum);animation:pp 1.8s infinite}
-  @keyframes pp{0%{box-shadow:0 0 0 0 rgba(194,22,140,.5)}70%{box-shadow:0 0 0 7px rgba(194,22,140,0)}100%{box-shadow:0 0 0 0 rgba(194,22,140,0)}}
-  .postoast{position:absolute; left:50%; bottom:84px; transform:translateX(-50%) translateY(8px);
-    background:var(--teal-deep); color:#fff; font-size:13px; font-weight:600; padding:11px 18px;
-    border-radius:12px; box-shadow:0 12px 34px rgba(40,20,55,.3); opacity:0; pointer-events:none; transition:.28s; z-index:9}
-  .postoast.show{opacity:1; transform:translateX(-50%) translateY(0)}
   .loader{position:absolute; font-size:13.5px; color:var(--muted); display:flex; gap:9px; align-items:center}
   .spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--plum);
     border-radius:50%;animation:sp .8s linear infinite}
@@ -113,10 +93,6 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         Escritorio
       </button>
-      <button id="tab-crm" onclick="show('crm')" aria-label="CRM">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-        CRM
-      </button>
       <button id="tab-meplus" onclick="show('meplus')" aria-label="Programa me+">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7-.1c0 5.6-7 14.1-7 14.1Z"/><path d="M12 9v5M9.5 11.5h5"/></svg>
         me+
@@ -126,7 +102,6 @@
       <span class="open-label">Abrir aparte:</span>
       <a class="openbtn" href="mobile.html" target="_blank" rel="noopener" title="Abrir la vista móvil a pantalla completa">Móvil ↗</a>
       <a class="openbtn" href="desktop.html" target="_blank" rel="noopener" title="Abrir la vista escritorio a pantalla completa">Escritorio ↗</a>
-      <a class="openbtn" href="crm.html" target="_blank" rel="noopener" title="Abrir el CRM a pantalla completa">CRM ↗</a>
       <a class="openbtn" href="meplus.html" target="_blank" rel="noopener" title="Abrir me+ a pantalla completa">me+ ↗</a>
     </div>
   </header>
@@ -140,33 +115,17 @@
       <div class="loader" id="ld-desktop"><span class="spin"></span> Cargando vista escritorio…</div>
       <div class="scaler" id="sc-desktop"><iframe id="frame-desktop" scrolling="no" title="TiendaConvatec Escritorio"></iframe></div>
     </div>
-    <div id="view-crm" class="view">
-      <div class="loader" id="ld-crm"><span class="spin"></span> Cargando CRM…</div>
-      <div class="scaler" id="sc-crm"><iframe id="frame-crm" title="TiendaConvatec CRM"></iframe></div>
-    </div>
     <div id="view-meplus" class="view">
       <div class="loader" id="ld-meplus"><span class="spin"></span> Cargando me+…</div>
       <div class="scaler" id="sc-meplus"><iframe id="frame-meplus" title="Programa me+"></iframe></div>
     </div>
-
-    <!-- Punto de venta demo: registra una compra ficticia que alimenta el CRM en vivo -->
-    <div class="pos" id="pos">
-      <span class="pulse"></span>
-      <div class="pl"><b>Punto de venta · DEMO</b><br><span id="posChan">Compra desde Móvil</span></div>
-      <select id="posCli" title="Cliente"></select>
-      <select id="posProd" title="Producto"></select>
-      <button class="buy" onclick="buyDemo()">🛒 Confirmar compra</button>
-    </div>
-    <div class="postoast" id="postoast"></div>
   </div>
 
-  <script src="store.js"></script>
   <script>
-    var VIEWS = ["mobile","desktop","crm","meplus"];
+    var VIEWS = ["mobile","desktop","meplus"];
     var SRC = {
       mobile: "mobile.html",
       desktop: "desktop.html",
-      crm: "crm.html",
       meplus: "meplus.html"
     };
     // sólo desktop se escala (render fijo); el resto llena el escenario
@@ -180,97 +139,8 @@
       f.addEventListener("load", function(){
         var ld = document.getElementById("ld-"+which);
         if(ld) ld.style.display = "none";
-        if(which==="mobile" || which==="desktop") hookShop(which, f);
       });
       f.src = SRC[which];
-    }
-
-    /* ============================================================
-       DETECCIÓN DE COMPRA REAL dentro del mockup (móvil/escritorio)
-       El bundle es una app React (mismo origen) → leemos el DOM ya
-       renderizado y escuchamos los clics de checkout / recompra.
-       ============================================================ */
-    var lastBuyTs = 0;
-    // Frases de intención de compra/checkout/recompra (texto visible del botón)
-    var BUY_RE = /\b(pagar|finalizar (compra|pedido|y pagar)|confirmar (compra|pedido|orden|y pagar)|realizar (pedido|compra|el pago|el pedido)|completar (compra|pedido|pago)|proceder (al|con el) pago|hacer pedido|pagar ahora|comprar ahora|comprar de nuevo|volver a comprar|repetir (pedido|compra)|suscribir|activar suscripci)\b/i;
-    // Frases de confirmación (pantalla de "gracias / pedido confirmado")
-    var DONE_RE = /(pedido confirmado|compra (exitosa|confirmada|realizada)|gracias por tu compra|tu pedido (está|esta|fue|ha sido)|pedido #|n\.? ?de pedido|orden confirmada|¡listo!|pago aprobado|recibimos tu pedido)/i;
-
-    function hookShop(which, frame){
-      var doc;
-      try { doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document); }
-      catch(e){ doc = null; } // cross-origin (no debería pasar: mismo origen)
-      if(!doc){ console.warn("No se pudo acceder al iframe "+which+" (cross-origin)"); return; }
-
-      // 1) Clic en un botón de checkout/recompra
-      doc.addEventListener("click", function(ev){
-        var node = ev.target, txt = "";
-        for(var i=0; i<6 && node; i++){
-          var t = (node.innerText || node.textContent || "").replace(/\s+/g," ").trim();
-          if(t && t.length <= 48){ txt = t; break; }
-          node = node.parentElement;
-        }
-        if(!txt) return;
-        if(BUY_RE.test(txt)) registerRealBuy(which, txt, false);
-      }, true);
-
-      // 2) Aparición de una pantalla de confirmación de pedido
-      try{
-        var obs = new MutationObserver(function(muts){
-          for(var m=0;m<muts.length;m++){
-            var added = muts[m].addedNodes;
-            for(var a=0;a<added.length;a++){
-              var el = added[a];
-              if(el.nodeType!==1) continue;
-              var t = (el.innerText || el.textContent || "");
-              if(t && DONE_RE.test(t)){ registerRealBuy(which, "pedido confirmado", true); return; }
-            }
-          }
-        });
-        obs.observe(doc.body || doc.documentElement, {childList:true, subtree:true});
-      }catch(e){}
-    }
-
-    function registerRealBuy(which, label, fromConfirm){
-      var now = Date.now();
-      if(now - lastBuyTs < 2500) return; // anti-doble-disparo
-      lastBuyTs = now;
-
-      var canal = which==="desktop" ? "Web" : "Móvil";
-      var l = (label||"").toLowerCase();
-      var esRecompra = /volver a comprar|comprar de nuevo|repetir|suscrib|suscripci/.test(l);
-
-      // Producto: intenta leer un producto/precio visible en el iframe; si no, usa el de recompra de la usuaria
-      var item = sniffProduct(which) || defaultItemForUser();
-
-      var orden = S.addOrder({
-        clienteId: S.APP_USER,        // la usuaria conectada en el mockup ("Laura")
-        canal: canal,
-        items: [item],
-        real: true,
-        subscripcion: esRecompra
-      });
-      var c = S.cliente(orden.clienteId);
-      posToast("✓ Compra REAL detectada ("+canal+") · "+(c?c.nombre:"")+" → "+orden.id+" cargada al CRM"+(esRecompra?" · suscripción me+ movida":""));
-    }
-
-    // Intenta leer un nombre de producto y precio visibles dentro del iframe
-    function sniffProduct(which){
-      try{
-        var doc = document.getElementById("frame-"+which).contentDocument;
-        var txt = (doc.body.innerText||"");
-        // ¿algún producto del catálogo aparece nombrado en pantalla?
-        for(var i=0;i<S.CATALOG.length;i++){
-          var key = S.CATALOG[i].nombre.split(" ").slice(0,2).join(" ");
-          if(txt.indexOf(key)>=0) return { sku:S.CATALOG[i].sku, qty:1 };
-        }
-      }catch(e){}
-      return null;
-    }
-    function defaultItemForUser(){
-      // producto base de recompra de la usuaria conectada
-      var r = S.recompra().filter(function(x){return x.cliente.id===S.APP_USER;})[0];
-      return r ? { sku:r.sku, qty:1 } : { sku:S.CATALOG[0].sku, qty:1 };
     }
 
     function fit(which){
@@ -290,59 +160,15 @@
       });
       ensureLoaded(which);
       fit(which);
-      updatePOS(which);
     }
 
     window.addEventListener("resize", function(){
       VIEWS.forEach(function(w){ if(loaded[w]) fit(w); });
     });
 
-    /* ---------- Punto de venta demo ---------- */
-    var S = window.ConvatecStore;
-    function fillPOS(){
-      var s = S.get();
-      var cli = document.getElementById("posCli");
-      var prod = document.getElementById("posProd");
-      cli.innerHTML = '<option value="">Cliente aleatorio</option>' + s.clientes.map(function(c){
-        return '<option value="'+c.id+'">'+c.nombre+'</option>';
-      }).join("");
-      prod.innerHTML = '<option value="">Producto aleatorio</option>' + S.CATALOG.map(function(p){
-        return '<option value="'+p.sku+'">'+p.nombre+'</option>';
-      }).join("");
-    }
-    function updatePOS(which){
-      var pos = document.getElementById("pos");
-      if(which==="mobile" || which==="desktop"){
-        pos.classList.add("show");
-        document.getElementById("posChan").textContent = "Compra desde " + (which==="mobile"?"Móvil":"Web");
-      } else {
-        pos.classList.remove("show");
-      }
-    }
-    function buyDemo(){
-      var active = document.querySelector(".view.active").id.replace("view-","");
-      var canal = active==="desktop" ? "Web" : "Móvil";
-      var cliId = document.getElementById("posCli").value;
-      var sku = document.getElementById("posProd").value;
-      var opts = { canal: canal };
-      if(cliId) opts.clienteId = cliId;
-      if(sku) opts.items = [{ sku: sku, qty: 1 }];
-      var orden = S.addOrder(opts);
-      var c = S.cliente(orden.clienteId);
-      posToast("✓ Compra "+orden.id+" registrada · "+(c?c.nombre:"")+" · "+orden.canal+" → alimentando CRM y me+");
-    }
-    var ptT;
-    function posToast(msg){
-      var t = document.getElementById("postoast");
-      t.textContent = msg; t.classList.add("show");
-      clearTimeout(ptT); ptT = setTimeout(function(){ t.classList.remove("show"); }, 3600);
-    }
-
     // default: mobile first
-    fillPOS();
     ensureLoaded("mobile");
     fit("mobile");
-    updatePOS("mobile");
   </script>
 </body>
 </html>
